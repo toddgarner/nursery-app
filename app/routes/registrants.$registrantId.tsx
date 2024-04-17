@@ -1,4 +1,4 @@
-import ReactDOMServer from "react-dom/server";
+import { useRef } from "react";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import {
@@ -19,6 +19,7 @@ import {
   updateChild,
 } from "~/models/registration.server";
 import { requireUserId } from "~/session.server";
+import ReactToPrint from "react-to-print";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -91,49 +92,18 @@ export const action = async ({ params, request }: ActionArgs) => {
   }
 };
 
-const Modal = ({ showModal, child }) => {
-
-
-  return (
-
-    <div className="bg-white w-96 min-h-156 mx-auto z-50 overflow-y-auto">
-      <div className="m-4 border-2">
-
-        <div className="text-left">
-          <div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{child.name}</p>
-              <hr />
-            </div>
-            <div className="mx-4 text-xl">
-              <br />
-              <p>Parent: {child.emergencyContactName}</p>
-              <p>Phone: {child.emergencyContactPhone}</p>
-              <p>Age: {child.age}</p>
-              <p>Medical: {child.medical}</p>
-              <br />
-              <br />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function ChildDetailsPage() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData();
-  const [showModal, setShowModal] = React.useState(false);
+
+  const componentRef = useRef();
 
   const child = data.child;
-  function toggleModal() {
-    // setShowModal(prevState => !prevState)
+  const PrintComponent = React.forwardRef((props, ref) => {
 
-    let printDiv = (
-      <div className="bg-white w-96 min-h-156 mx-auto z-50 overflow-y-auto">
-        <div className="m-2 border-2">
-
+    return (
+      <div ref={ref} className="bg-white w-96 min-h-156 z-50 overflow-y-auto">
+        <div className="m-4 border-2">
           <div className="text-left">
             <div>
               <div className="text-center">
@@ -153,23 +123,8 @@ export default function ChildDetailsPage() {
           </div>
         </div>
       </div>
-    )
-
-    const printContents = ReactDOMServer.renderToString(printDiv);
-
-    const w = window.open();
-    w.document.write(printContents);
-    w.print();
-    w.close();
-  };
-
-  if (showModal) {
-    return (
-      <>
-        <Modal showModal={showModal} onClose={toggleModal} child={child} />
-      </>
-    )
-  }
+    );
+  });
 
   return (
 
@@ -274,10 +229,16 @@ export default function ChildDetailsPage() {
           </button>
         </Form>
       </div>
+
       <div>
-        <button className="m-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
-          onClick={toggleModal}>Print
-        </button>
+        <ReactToPrint
+          trigger={() => <button className="m-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+          >Print
+          </button>}
+          content={() => componentRef.current}
+        />
+        <div className="mt-2 text-xl italic text-bold">Label Preview:</div>
+        <PrintComponent ref={componentRef} />
       </div>
     </div>
   );
