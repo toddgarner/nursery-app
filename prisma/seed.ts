@@ -16,20 +16,24 @@ async function seed() {
   const hashedPassword = await bcrypt.hash("vbsadmin", 10);
 
   // Create roles
-  // const guardianRole = await prisma.role.create({
-  //   data: { name: "Guardian" },
-  // });
+  const guardianRole = await prisma.role.upsert({
+    where: { id: 2 },
+    update: {},
+    create: { id: 2, name: "Guardian" },
+  });
 
-  // const adminRole = await prisma.role.create({
-  //   data: { name: "Admin" },
-  // });
+  const adminRole = await prisma.role.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1, name: "Admin" },
+  });
 
   const user = await prisma.user.create({
     data: {
       email,
       phone,
       name,
-      roleId: 2, // Assign the Admin role to the user
+      roleId: 1, // Assign the Admin role to the user
       password: {
         create: {
           hash: hashedPassword,

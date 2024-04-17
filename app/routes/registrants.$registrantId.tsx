@@ -1,3 +1,4 @@
+import ReactDOMServer from "react-dom/server";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import {
@@ -8,6 +9,7 @@ import {
   useLoaderData,
   useRouteError,
 } from "@remix-run/react";
+import React from "react";
 import invariant from "tiny-invariant";
 import { sendQrCode, textQrCode } from "~/models/aws.server";
 
@@ -36,7 +38,7 @@ export const action = async ({ params, request }: ActionArgs) => {
   const formData = await request.formData();
   const action = formData.get("_action");
   const phone = formData.get("phone")?.toString() || "";
-  const registrant = formData.get("registrant")?.toString() || "";
+  const name = formData.get("registrant")?.toString() || "";
   const qrcode = formData.get("qrcode")?.toString() || "";
   const email = formData.get("email")?.toString() || "";
 
@@ -89,21 +91,96 @@ export const action = async ({ params, request }: ActionArgs) => {
   }
 };
 
+const Modal = ({ showModal, child }) => {
+
+
+  return (
+
+    <div className="bg-white w-96 min-h-156 mx-auto z-50 overflow-y-auto">
+      <div className="m-4 border-2">
+
+        <div className="text-left">
+          <div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{child.name}</p>
+              <hr />
+            </div>
+            <div className="mx-4 text-xl">
+              <br />
+              <p>Parent: {child.emergencyContactName}</p>
+              <p>Phone: {child.emergencyContactPhone}</p>
+              <p>Age: {child.age}</p>
+              <p>Medical: {child.medical}</p>
+              <br />
+              <br />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ChildDetailsPage() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData();
+  const [showModal, setShowModal] = React.useState(false);
+
+  const child = data.child;
+  function toggleModal() {
+    // setShowModal(prevState => !prevState)
+
+    let printDiv = (
+      <div className="bg-white w-96 min-h-156 mx-auto z-50 overflow-y-auto">
+        <div className="m-2 border-2">
+
+          <div className="text-left">
+            <div>
+              <div className="text-center">
+                <p className="text-2xl font-bold">{child.name}</p>
+                <hr />
+              </div>
+              <div className="mx-4 text-xl">
+                <br />
+                <p>Parent: {child.emergencyContactName}</p>
+                <p>Phone: {child.emergencyContactPhone}</p>
+                <p>Age: {child.age}</p>
+                <p>Medical: {child.medical}</p>
+                <br />
+                <br />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+
+    const printContents = ReactDOMServer.renderToString(printDiv);
+
+    const w = window.open();
+    w.document.write(printContents);
+    w.print();
+    w.close();
+  };
+
+  if (showModal) {
+    return (
+      <>
+        <Modal showModal={showModal} onClose={toggleModal} child={child} />
+      </>
+    )
+  }
 
   return (
-    <div>
+
+    <div className="m-8">
       <h3 className="text-2xl font-bold">{data.child.name}</h3>
       <p className="py-2">Age: {data.child.age}</p>
-      <p className="py-2">DOB: {data.child.grade}</p>
+      <p className="py-2">Parent: {child.emergencyContactName}</p>
+      <p className="py-2">Phone: {child.emergencyContactPhone}</p>
       <p className="py-2">
         Medical concerns / Allergies:{" "}
         {data.child.medical ? data.child.medical : "none"}
-      </p>
-      <p className="py-2">
-        Checkin Status: {data.child.checkedIn === true ? "In" : "Out"}
       </p>
 
       {actionData &&
@@ -122,9 +199,9 @@ export default function ChildDetailsPage() {
             <span className="block sm:inline">{actionData.message}</span>
           </div>
         ))}
-      <div className="mx-auto my-4 w-full pb-1">
+      {/* <div className="mx-auto my-4 w-full pb-1">
         <img src={data.child.qrcode} alt={"child qr code"} />
-      </div>
+      </div> */}
 
       <hr className="my-4" />
       <div className="flex flex-wrap">
@@ -135,10 +212,9 @@ export default function ChildDetailsPage() {
           Edit
         </Link>
 
-        <Form method="post">
+        {/* <Form method="post">
           <input type="hidden" name="registrantId" value={data.child.id} />
           <input type="hidden" name="qrcode" value={data.child.qrcode} />
-
           <button
             type="submit"
             name="_action"
@@ -148,7 +224,6 @@ export default function ChildDetailsPage() {
             {data.child.checkedIn === true ? "Check Out" : "Check In"}
           </button>
         </Form>
-
         <Form method="post">
           <input type="hidden" name="registrantId" value={data.child.id} />
           <input type="hidden" name="registrant" value={data.child.name} />
@@ -171,7 +246,7 @@ export default function ChildDetailsPage() {
           >
             Text QR Code
           </button>
-        </Form>
+        </Form> */}
         {/* <Form method="post">
           <input type="hidden" name="phone" value={data.child.phone} />
           <input
@@ -188,17 +263,22 @@ export default function ChildDetailsPage() {
             Text QR Code
           </button>
         </Form> */}
+        <Form method="post">
+          <button
+            type="submit"
+            name="_action"
+            value="deleteChild"
+            className="m-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:bg-red-400"
+          >
+            Delete
+          </button>
+        </Form>
       </div>
-      <Form method="post">
-        <button
-          type="submit"
-          name="_action"
-          value="deleteChild"
-          className="m-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600 focus:bg-red-400"
-        >
-          Delete
+      <div>
+        <button className="m-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
+          onClick={toggleModal}>Print
         </button>
-      </Form>
+      </div>
     </div>
   );
 }

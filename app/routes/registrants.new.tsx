@@ -90,8 +90,10 @@ export const action = async ({ request }: ActionArgs) => {
     userId: guardianId,
   });
 
-  const qrcode = await createQRCode(child.id);
+  // not doing qrcode at the momemnt
+  // const qrcode = await createQRCode(child.id);
 
+  const qrcode = ""
   if (child) {
     await updateChild(
       child.id,
@@ -167,7 +169,7 @@ export default function NewNotePage() {
         </div>
 
         <div>
-          <label className="flex w-16 flex-col gap-1">
+          <label className="flex w-32 flex-col gap-1">
             <span>Child Age: </span>
             <input
               ref={ageRef}
@@ -189,22 +191,6 @@ export default function NewNotePage() {
 
         <div>
           <label className="flex w-full flex-col gap-1">
-            <span>Grade: </span>
-            <input
-              ref={gradeRef}
-              name="grade"
-              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
-            />
-          </label>
-          {actionData?.errors?.grade ? (
-            <div className="pt-1 text-red-700" id="grade-error">
-              {actionData.errors.grade}
-            </div>
-          ) : null}
-        </div>
-
-        <div>
-          <label className="flex w-full flex-col gap-1">
             <span>Medical Concerns / Allergies: </span>
             <input
               ref={medicalRef}
@@ -216,17 +202,7 @@ export default function NewNotePage() {
 
         <div>
           <label className="flex w-full flex-col gap-1">
-            <span>T-Shirt Size: </span>
-            <input
-              name="tshirtSize"
-              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
-            />
-          </label>
-        </div>
-
-        <div>
-          <label className="flex w-full flex-col gap-1">
-            <span>Emergency Contact Name: </span>
+            <span>Parent/Guardian: </span>
             <input
               name="emergencyContactName"
               className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
@@ -235,33 +211,9 @@ export default function NewNotePage() {
         </div>
         <div>
           <label className="flex w-full flex-col gap-1">
-            <span>Emergency Contact Phone: </span>
+            <span>Phone Number: </span>
             <input
               name="emergencyContactPhone"
-              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
-            />
-          </label>
-        </div>
-
-        <div>
-          <label className="flex w-full flex-col gap-1">
-            <span>Picture Permission: </span>
-            <input
-              name="picPermission"
-              type="checkbox"
-              defaultChecked={true}
-              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
-            />
-          </label>
-        </div>
-
-        <div>
-          <label className="flex w-full flex-col gap-1">
-            <span>Transportation: </span>
-            <input
-              name="transportation"
-              type="checkbox"
-              defaultChecked={false}
               className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
             />
           </label>

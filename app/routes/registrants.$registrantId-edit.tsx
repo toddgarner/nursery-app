@@ -21,7 +21,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export const action = async ({ request }: ActionArgs) => {
   const userId = await requireUserId(request);
   const formData = await request.formData();
-  const registrant = formData.get("registrant");
+  const name = formData.get("registrant");
   const email = formData.get("email");
   const age = formData.get("age")?.toString() || "";
   const phone = formData.get("phone");
@@ -29,6 +29,8 @@ export const action = async ({ request }: ActionArgs) => {
   const qrcode = formData.get("qrcode")?.toString() || "";
   const dobForm = formData.get("dob")?.toString();
   const medical = formData.get("medical")?.toString() || "";
+  const emergencyContactName = formData.get("emergencyContactName")?.toString() || "";
+  const emergencyContactPhone = formData.get("emergencyContactPhone")?.toString() || "";
 
   let dob = new Date();
 
@@ -36,12 +38,12 @@ export const action = async ({ request }: ActionArgs) => {
     dob = new Date(dobForm);
   }
 
-  if (typeof registrant !== "string" || registrant.length === 0) {
+  if (typeof name !== "string" || name.length === 0) {
     return json(
       {
         errors: {
           email: null,
-          registrant: "Registrant is required",
+          registrant: "Name is required",
           age: null,
           phone: null,
           dob: null,
@@ -51,33 +53,33 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  if (typeof email !== "string" || email.length === 0) {
-    return json(
-      {
-        errors: {
-          email: "Email is required",
-          registrant: null,
-          age: null,
-          phone: null,
-          dob: null,
-        },
-      },
-      { status: 400 }
-    );
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return json(
-      {
-        errors: {
-          email: "Email is invalid",
-          registrant: null,
-          age: null,
-          phone: null,
-          dob: null,
-        },
-      },
-      { status: 400 }
-    );
-  }
+  // if (typeof email !== "string" || email.length === 0) {
+  //   return json(
+  //     {
+  //       errors: {
+  //         email: "Email is required",
+  //         registrant: null,
+  //         age: null,
+  //         phone: null,
+  //         dob: null,
+  //       },
+  //     },
+  //     { status: 400 }
+  //   );
+  // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  //   return json(
+  //     {
+  //       errors: {
+  //         email: "Email is invalid",
+  //         registrant: null,
+  //         age: null,
+  //         phone: null,
+  //         dob: null,
+  //       },
+  //     },
+  //     { status: 400 }
+  //   );
+  // }
 
   const ageInt = parseInt(age);
 
@@ -112,50 +114,50 @@ export const action = async ({ request }: ActionArgs) => {
   const phoneRegex: RegExp =
     /^(\([0-9]{3}\)|[0-9]{3})[- ]?[0-9]{3}[- ]?[0-9]{4}$/gm;
 
-  if (typeof phone !== "string" || phone.length === 0) {
-    return json(
-      {
-        errors: {
-          email: null,
-          registrant: null,
-          age: null,
-          phone: "Phone is required",
-          dob: null,
-        },
-      },
-      { status: 400 }
-    );
-  } else if (!phoneRegex.test(phone)) {
-    return json(
-      {
-        errors: {
-          email: null,
-          registrant: null,
-          age: null,
-          phone: "Phone is invalid",
-          dob: null,
-        },
-      },
-      { status: 400 }
-    );
-  }
+  // if (typeof phone !== "string" || phone.length === 0) {
+  //   return json(
+  //     {
+  //       errors: {
+  //         email: null,
+  //         registrant: null,
+  //         age: null,
+  //         phone: "Phone is required",
+  //         dob: null,
+  //       },
+  //     },
+  //     { status: 400 }
+  //   );
+  // } else if (!phoneRegex.test(phone)) {
+  //   return json(
+  //     {
+  //       errors: {
+  //         email: null,
+  //         registrant: null,
+  //         age: null,
+  //         phone: "Phone is invalid",
+  //         dob: null,
+  //       },
+  //     },
+  //     { status: 400 }
+  //   );
+  // }
 
   const child = await getChild(childId);
 
   if (child) {
     await updateChild(
       child.id,
-      child.name,
+      name,
       child.age,
       child.grade,
       child.userId,
-      child.medical,
+      medical,
       qrcode,
       child.picPermission,
       child.tshirtSize,
       child.transportation,
-      child.emergencyContactName,
-      child.emergencyContactPhone,
+      emergencyContactName,
+      emergencyContactPhone,
       child.checkedIn
     );
   }
@@ -191,9 +193,9 @@ export default function NewNotePage() {
 
   return (
     <div>
-      <p>{data.child.user.name}</p>
+      {/* <p>{data.child.user.name}</p>
       <p>{data.child.user.phone}</p>
-      <p>{data.child.user.email}</p>
+      <p>{data.child.user.email}</p> */}
 
       <Form
         method="post"
@@ -225,7 +227,7 @@ export default function NewNotePage() {
           ) : null}
         </div>
 
-        <div>
+        {/* <div>
           <label className="flex w-full flex-col gap-1">
             <span>Email: </span>
             <input
@@ -244,7 +246,7 @@ export default function NewNotePage() {
               {actionData.errors.email}
             </div>
           ) : null}
-        </div>
+        </div> */}
 
         <div>
           <label className="flex w-16 flex-col gap-1">
@@ -297,6 +299,27 @@ export default function NewNotePage() {
               ref={medicalRef}
               defaultValue={data.child.medical}
               name="medical"
+              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
+            />
+          </label>
+        </div>
+
+        <div>
+          <label className="flex w-full flex-col gap-1">
+            <span>Parent/Guardian: </span>
+            <input
+              defaultValue={data.child.emergencyContactName}
+              name="emergencyContactName"
+              className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
+            />
+          </label>
+        </div>
+        <div>
+          <label className="flex w-full flex-col gap-1">
+            <span>Phone Number: </span>
+            <input
+              defaultValue={data.child.emergencyContactPhone}
+              name="emergencyContactPhone"
               className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 py-2 text-lg leading-6"
             />
           </label>
