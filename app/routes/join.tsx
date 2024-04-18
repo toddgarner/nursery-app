@@ -127,7 +127,7 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  const defaultRoleId = 2;
+  const defaultRoleId = 1;
 
   const user = await createUser(email, password, defaultRoleId, phone, name);
 
