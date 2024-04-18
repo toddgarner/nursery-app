@@ -11,12 +11,12 @@ export default function Index() {
     return (
       <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
         <div className="text-lg font-semibold text-gray-700">
-          Welcome to NCF! To have your child(ren) attend VBS{" "}
+          Welcome to the Nursery!{" "}
           <a
             href="/registrants"
             className="text-blue-500 underline hover:text-blue-700"
           >
-            register here
+            Sign in here
           </a>
           .
         </div>

@@ -4,16 +4,16 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "vbsadmin@ncf.org";
+  const email = "nurseryncf@gmail.com";
   const phone = "1234567890";
-  const name = "VBSAdmin";
+  const name = "NCF Nursery";
 
   // cleanup the existing database
   await prisma.user.delete({ where: { email } }).catch(() => {
     // no worries if it doesn't exist yet
   });
 
-  const hashedPassword = await bcrypt.hash("vbsadmin", 10);
+  const hashedPassword = await bcrypt.hash("ncfnursery", 10);
 
   // Create roles
   const guardianRole = await prisma.role.upsert({
