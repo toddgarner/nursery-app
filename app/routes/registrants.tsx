@@ -27,6 +27,13 @@ export const loader = async ({ request }: LoaderArgs) => {
       ? adminChildListItems
       : await getChildListItems(userId);
 
+  // sort chidren by name
+  if (childListItems && childListItems.children) {
+    childListItems.children = childListItems.children.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
   return json({ childListItems, pathname });
 };
 
@@ -139,8 +146,7 @@ export default function RegistrantsPage() {
                   <li key={child.id}>
                     <NavLink
                       className={({ isActive }) =>
-                        `block border-b p-4 text-xl ${
-                          isActive ? "bg-white" : ""
+                        `block border-b p-4 text-xl ${isActive ? "bg-white" : ""
                         }`
                       }
                       to={child.id}
@@ -181,8 +187,7 @@ export default function RegistrantsPage() {
                       <NavLink
                         reloadDocument
                         className={({ isActive }) =>
-                          `block border-b p-4 text-xl ${
-                            isActive ? "bg-white" : ""
+                          `block border-b p-4 text-xl ${isActive ? "bg-white" : ""
                           }`
                         }
                         to={child.id}
