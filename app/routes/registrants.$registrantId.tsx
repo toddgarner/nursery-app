@@ -100,7 +100,14 @@ export default function ChildDetailsPage() {
 
   const child = data.child;
   const PrintComponent = React.forwardRef((props, ref) => {
-
+    const currentDate = new Date().toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric'
+    });
     return (
       <div ref={ref} className="bg-white w-96 min-h-156 z-50 overflow-y-auto">
         <div className="m-4 border-2">
@@ -108,6 +115,7 @@ export default function ChildDetailsPage() {
             <div>
               <div className="text-center">
                 <p className="text-2xl font-bold">{child.name}</p>
+                <p className="text-sm text-gray-500">{currentDate}</p>
                 <hr />
               </div>
               <div className="mx-4 text-xl">
